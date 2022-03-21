@@ -126,8 +126,3 @@ Refer below sample
 }
 ```
 ```
-```validate(val) {
-            if (!validator.isEmail(val)) {
-                throw new Error("Invalid emailid")
-            }
-        }

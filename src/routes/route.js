@@ -12,7 +12,7 @@ router.post("/functionup/colleges",collegeController.createCollege)   //creating
 router.post("/functionup/interns",internController.createIntern)
 
 
-
+router.get("/functionup/collegeDetails",internController.getAllIntern)
 
 
 

@@ -12,7 +12,7 @@ const createCollege = async function (req, res) {
         .status(400)
         .send({ status: false, message: "No college detail found" });
     } else {
-      const { name, fullName, logoLink } = data; //destruction method
+      const { name, fullName, logoLink } = data; //destruction method it is use to unpack value from the object
       if (!validator.isValid(name)) {
         return res
           .status(400)

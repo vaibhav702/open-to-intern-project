@@ -25,7 +25,7 @@ const createIntern = async function (req, res) {
     }
     //\d means "digit," and {10} means "ten times." The ^ and $ anchor it to the start and end, so something like asdf1234567890asdf does not match.
     if (!mobile) {
-      res.status(400).send({ status: false, message: "please enter mobile" });
+      res.status(404).send({ status: false, message: "please enter mobile" });
     }
 
     const isMobileAlreadyUsed = await internModel.findOne({
@@ -33,15 +33,15 @@ const createIntern = async function (req, res) {
       isDeleted: false,
     });
     if (isMobileAlreadyUsed) {
-      return res.status(400).send({
+      return res.status(404).send({
         status: false,
         message: `${mobile} is already used so please put valid input`,
       });
     }
     //email validation
-    if (!(/^([a-zA-Z0-9\.-]+)@([a-zA-Z0-9-]+).([a-z]+)$/).test(email)) {
+    if (!/^([a-zA-Z0-9\.-]+)@([a-zA-Z0-9-]+).([a-z]+)$/.test(email)) {
       return res
-        .status(400)
+        .status(404)
         .send({ status: false, message: "email required compulsory" });
     }
     if (!email) {
@@ -53,7 +53,7 @@ const createIntern = async function (req, res) {
       isDeleted: false,
     });
     if (isEmailAlreadyUsed) {
-      return res.status(400).send({
+      return res.status(404).send({
         status: false,
         message: `${email} is already used so please put valid input`,
       });
@@ -89,43 +89,46 @@ const getAllIntern = async function (req, res) {
     }
     const collegeName = req.query.collegeName;
     if (!validator.isValid(collegeName)) {
-        return res.status(400).send({
+      return res.status(400).send({
         status: false,
         message: "please enter valid college name",
       });
     }
-   
-    const details = await collegeModel.find({
-      name: collegeName,
-      isDeleted: false,
-    });
-    if(!details.length) {
-        return res.status(400).send({
+
+    const details = await collegeModel
+      .findOne({
+        name: collegeName,
+        isDeleted: false,
+      })
+     
+    if (!details) {
+      return res.status(400).send({
         status: false,
         message: "please enter valid detail of college ",
       });
+      
     }
-    const collegeId = details[0]._id;  //to give it in array
+    const collegeId = details._id; //to give it in array
     const internDetail = await internModel.find({
       collegeId,
       isDeleted: false,
-    });
+    }).select({name:1,_id:1,email:1,mobile:1   
+    });   //it is use true false for 0 and 1
     if (!internDetail.length) {
-     return res.status(400).send({
+      return res.status(400).send({
         status: false,
         message: "please enter valid detail of intern no intern found",
       });
     }
     const finalData = {
-      name: details[0].name,
-      fullName: details[0].fullName,
-      logoLink: details[0].logoLink,
+      name: details.name,
+      fullName: details.fullName,
+      logoLink: details.logoLink,
       interest: internDetail,
     };
 
-   return res.status(200).send({ status: true, data: finalData });
-  }
-   catch (error) {
+    return res.status(200).send({ status: true, data: finalData });
+  } catch (error) {
     return res.status(500).send({
       status: false,
       message: error.message,

@@ -6,7 +6,7 @@ const validator = require("../validator/validator");
 const createIntern = async function (req, res) {
   try {
     let data = req.body;
-    const { name, mobile, email, collegeName } = data;
+    const { name, mobile, email, collegeId } = data;
     if (!validator.isValidRequestBody(data)) {
       return res
         .status(400)
@@ -44,7 +44,7 @@ const createIntern = async function (req, res) {
     if (/^([a-zA-Z0-9\.-]+)@([a-zA-Z0-9-]+).([a-z]+)$/.test(email)) {
       return res
         .status(400)
-        .send({ status: false, message: "mobile required compulsory" });
+        .send({ status: false, message: "email required compulsory" });
     }
     if (!email) {
       res.status(400).send({ status: false, message: "please enter  email" });
@@ -62,24 +62,13 @@ const createIntern = async function (req, res) {
           message: `${email} is already used so please put valid input`,
         });
     }
-    if (!validator.isValid(collegeName)) {
+    if (!validator.isValidObjectId(collegeId)) {
       return res
         .status(400)
-        .send({ status: false, message: "please put valid collegeName " });
+        .send({ status: false, message: "please put valid collegeId " });
     }
 
-    let collegeDetail = await collegeModel.findOne({
-      name: collegeName,
-      isDeleted: false,
-    });
-    if (!collegeDetail) {
-      return res
-        .status(400)
-        .send({ status: false, message: "no such collegeDetails Found" });
-    }
-    console.log(collegeDetail)
-
-    data["collegeId"] = collegeDetail._id;
+   
     let savedData = await internModel.create(data);
     return res
       .status(201)
